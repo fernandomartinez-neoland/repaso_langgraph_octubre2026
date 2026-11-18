@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Chat IA LangGraph</title>
+    <style>
+      body { font-family: Arial; max-width: 500px; margin: 20px auto; }
+      #chat { height: 300px; border: 1px solid #ccc; padding: 10px; overflow-y: auto; margin-bottom: 10px; }
+      p { margin: 5px 0; }
+      .yo { color: blue; }
+      .ia { color: green; }
+    </style>
+  </head>
+  <body>
+    <h2>Chat IA en Vivo</h2>
+    <div id="chat"></div>
+    <input type="text" id="mensaje" placeholder="Escribe aquí..." style="width: 75%" />
+    <button onclick="enviarMensaje()">Enviar</button>
+
+    <script>
+      const ws = new WebSocket("ws://localhost:8080");
+      const chat = document.getElementById("chat");
+      const input = document.getElementById("mensaje");
+
+      ws.onmessage = (evento) => {
+        chat.innerHTML += `<p class="ia"><b>IA:</b> ${evento.data}</p>`;
+        chat.scrollTop = chat.scrollHeight;
+      };
+
+      function enviarMensaje() {
+        const texto = input.value;
+        if (!texto) return;
+
+        chat.innerHTML += `<p class="yo"><b>Tú:</b> ${texto}</p>`;
+        ws.send(texto);
+        input.value = "";
+      }
+
+      input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") enviarMensaje();
+      });
+    </script>
+  </body>
+</html>
